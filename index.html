@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Webtoon App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #f8f8f8; color: #333; padding-bottom: 70px; }
+
+    /* Thanh trên cùng: Tìm kiếm */
+    .top-bar { position: sticky; top: 0; background: #fff; padding: 10px 15px; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .search-box { display: flex; align-items: center; background: #f0f0f0; border-radius: 20px; padding: 8px 15px; }
+    .search-box input { border: none; background: transparent; outline: none; width: 100%; margin-left: 8px; font-size: 14px; }
+
+    /* Dải Thể loại (Chữ, Tranh, Tiểu thuyết) */
+    .categories { display: flex; gap: 10px; overflow-x: auto; padding: 12px 15px; background: #fff; scrollbar-width: none; }
+    .categories::-webkit-scrollbar { display: none; }
+    .cat-item { padding: 6px 14px; background: #f0f2f5; border-radius: 15px; font-size: 13px; white-space: nowrap; font-weight: 500; cursor: pointer; }
+    .cat-item.active { background: #ff2442; color: #fff; } /* Màu đỏ Tiểu Hồng Thư */
+
+    /* Khung nội dung chính */
+    .tab-content { display: none; padding: 15px; }
+    .tab-content.active { display: block; }
+
+    /* Danh sách truyện nổi bật */
+    .section-title { font-size: 16px; font-weight: bold; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .story-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .story-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .story-cover { width: 100%; height: 180px; object-fit: cover; background: #eee; }
+    .story-info { padding: 8px 10px; }
+    .story-title { font-size: 13px; font-weight: bold; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .story-tag { font-size: 11px; color: #ff2442; background: #ffebeb; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+
+    /* Giao diện Thẻ Tag Hot */
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-badge { background: #fff; border: 1px solid #e2e2e2; padding: 8px 12px; border-radius: 20px; font-size: 13px; }
+
+    /* Giao diện Tài khoản (Style Tiểu Hồng Thư + MangaToon) */
+    .profile-card { background: #fff; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; }
+    .avatar { width: 70px; height: 70px; border-radius: 50%; background: #ddd; margin: 0 auto 10px; }
+    .wallet-box { background: linear-gradient(135deg, #ff2442, #ff6b81); color: #fff; border-radius: 12px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .following-list { background: #fff; border-radius: 12px; padding: 15px; }
+    .author-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+    .author-avatar { width: 40px; height: 40px; border-radius: 50%; background: #ccc; }
+
+    /* Thanh Công Cụ Đáy (Kiểu TikTok - 3 Tab) */
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #fff; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; z-index: 1000; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #888; cursor: pointer; }
+    .nav-item.active { color: #ff2442; font-weight: bold; }
+    .nav-icon { font-size: 20px; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- TAB 1: TRANG CHÍNH -->
+  <div id="tab-home" class="tab-content active">
+    <!-- Thanh Tìm Kiếm -->
+    <div class="top-bar">
+      <div class="search-box">
+        🔍 <input type="text" placeholder="Tìm tên truyện, tác giả...">
+      </div>
+    </div>
+
+    <!-- Đề xuất Thể loại -->
+    <div class="categories">
+      <div class="cat-item active">Tất cả</div>
+      <div class="cat-item">Truyện Tranh (Webtoon)</div>
+      <div class="cat-item">Truyện Chữ</div>
+      <div class="cat-item">Tiểu Thuyết</div>
+      <div class="cat-item">Đam Mỹ</div>
+      <div class="cat-item">Ngôn Tình</div>
+    </div>
+
+    <!-- Đề xuất Bộ Đang Nổi -->
+    <div style="padding-top: 10px;">
+      <div class="section-title">
+        <span>🔥 Đang Nổi Bật</span>
+      </div>
+      <div class="story-grid">
+        <div class="story-card">
+          <img class="story-cover" src="https://placehold.co/300x400/ff2442/fff?text=Webtoon+1" alt="Cover">
+          <div class="story-info">
+            <div class="story-title">Hôn Nhân Hợp Đồng</div>
+            <span class="story-tag">Truyện Tranh</span>
+          </div>
+        </div>
+        <div class="story-card">
+          <img class="story-cover" src="https://placehold.co/300x400/2196f3/fff?text=Novel+1" alt="Cover">
+          <div class="story-info">
+            <div class="story-title">Toàn Trí Độc Giả</div>
+            <span class="story-tag">Tiểu Thuyết</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: PHÂN LOẠI / TAGS -->
+  <div id="tab-tags" class="tab-content">
+    <div class="section-title">🏷️ Tag Đang Hot</div>
+    <div class="tag-cloud">
+      <div class="tag-badge">#HệThống</div>
+      <div class="tag-badge">#TrọngSinh</div>
+      <div class="tag-badge">#TổngTài</div>
+      <div class="tag-badge">#HànhĐộng</div>
+      <div class="tag-badge">#HàiHước</div>
+      <div class="tag-badge">#KinhDị</div>
+    </div>
+  </div>
+
+  <!-- TAB 3: TÀI KHOẢN (MangaToon & Xiaohongshu Style) -->
+  <div id="tab-profile" class="tab-content">
+    <!-- Thông tin cá nhân -->
+    <div class="profile-card">
+      <div class="avatar"></div>
+      <h3 style="font-size: 16px;">Độc Giả Dễ Thương</h3>
+      <p style="font-size: 12px; color: #666; margin-top: 4px;">ID: 8839201</p>
+    </div>
+
+    <!-- Ví Xu MangaToon -->
+    <div class="wallet-box">
+      <div>
+        <div style="font-size: 12px; opacity: 0.9;">Số Xu Hiện Có</div>
+        <div style="font-size: 22px; font-weight: bold; margin-top: 2px;">150 🪙</div>
+      </div>
+      <button style="background: #fff; color: #ff2442; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold;">Nạp Xu</button>
+    </div>
+
+    <!-- Tác giả/Người dùng đang theo dõi ngay tại trang Tài khoản -->
+    <div class="following-list">
+      <div class="section-title" style="font-size: 14px;">Đang Theo Dõi (2)</div>
+      <div class="author-item">
+        <div class="author-avatar"></div>
+        <div>
+          <div style="font-size: 13px; font-weight: bold;">Tác giả A</div>
+          <div style="font-size: 11px; color: #888;">Cập nhật 2 giờ trước</div>
+        </div>
+      </div>
+      <div class="author-item">
+        <div class="author-avatar"></div>
+        <div>
+          <div style="font-size: 13px; font-weight: bold;">Dịch Giả B</div>
+          <div style="font-size: 11px; color: #888;">Cập nhật hôm qua</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THANH CÔNG CỤ ĐÁY (TIKTOK STYLE) -->
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('tab-home', this)">
+      <span class="nav-icon">🏠</span>
+      <span>Trang chủ</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-tags', this)">
+      <span class="nav-icon">🏷️</span>
+      <span>Phân loại</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-profile', this)">
+      <span class="nav-icon">👤</span>
+      <span>Tài khoản</span>
+    </div>
+  </div>
+
+  <script>
+    // Hàm chuyển Tab dưới thanh công cụ
+    function switchTab(tabId, element) {
+      // Ẩn tất cả nội dung tab
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      // Bỏ Active ở tất cả nút bấm
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      
+      // Bật tab được chọn
+      document.getElementById(tabId).classList.add('active');
+      element.classList.add('active');
+    }
+  </script>
+</body>
+</html>
